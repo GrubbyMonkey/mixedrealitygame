@@ -103,7 +103,7 @@
       const selectedWord = selectedCells.map(cell => grid[cell.row][cell.col]).join('');
       if (selectedWord === words[0]) {
         clearInterval(timer);
-        document.getElementById('message').textContent = 'Congratulations! You found the word "apple"!';
+        document.getElementById('message').textContent = 'Congratulations! You found the word "apple"!'\n 'Now look for apple at the book stacks/shelves.';
         hideGrid(); // Call function to hide the grid
       }
     }
