@@ -1,142 +1,95 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Word Search Game</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-    }
-    #timer {
-      font-size: 2em;
-      text-align: center;
-      margin-bottom: 20px; /* Add margin to separate from the grid */
-    }
-    #wordSearch {
-      display: grid;
-      grid-template-columns: repeat(20, 5vw);
-      grid-template-rows: repeat(20, 5vw);
-      gap: 1px;
-      border: 1px solid black;
-      max-width: 90vw;
-      margin: 0 auto;
-    }
-    .cell {
-      background-color: #ddd;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      cursor: pointer;
-      font-size: 0.8em;
-    }
-    .selected {
-      background-color: #aaf;
-    }
-    #message {
-      font-size: 1.2em;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <div id="timer">Time Left: <span id="countdown">120</span> seconds</div>
-  <div id="wordSearch"></div>
-  <div id="message"></div>
+<script>
+  const words = ['apple'];
+  let grid = [];
+  let selectedCells = [];
+  let timer;
+  let timeLeft = 120;
 
-  <script>
-    const words = ['apple'];
-    let grid = [];
-    let selectedCells = [];
-    let timer;
-    let timeLeft = 120;
-
-    function generateGrid() {
-      const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      for (let i = 0; i < 20; i++) {
-        let row = [];
-        for (let j = 0; j < 20; j++) {
-          let randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
-          row.push(randomLetter);
-        }
-        grid.push(row);
+  function generateGrid() {
+    const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    for (let i = 0; i < 20; i++) {
+      let row = [];
+      for (let j = 0; j < 20; j++) {
+        let randomLetter = alphabet[Math.floor(Math.random() * alphabet.length)];
+        row.push(randomLetter);
       }
-      // Place the word 'apple' randomly in the grid
-      const wordIndex = Math.floor(Math.random() * 20);
-      const startCol = Math.floor(Math.random() * (20 - words[0].length + 1));
-      for (let i = 0; i < words[0].length; i++) {
-        grid[wordIndex][startCol + i] = words[0][i];
+      grid.push(row);
+    }
+    // Place the word 'apple' randomly in the grid
+    const wordIndex = Math.floor(Math.random() * 20);
+    const startCol = Math.floor(Math.random() * (20 - words[0].length + 1));
+    for (let i = 0; i < words[0].length; i++) {
+      grid[wordIndex][startCol + i] = words[0][i];
+    }
+  }
+
+  function displayGrid() {
+    const wordSearch = document.getElementById('wordSearch');
+    wordSearch.innerHTML = '';
+    for (let i = 0; i < 20; i++) {
+      for (let j = 0; j < 20; j++) {
+        const cell = document.createElement('div');
+        cell.classList.add('cell');
+        cell.textContent = grid[i][j];
+        cell.dataset.row = i;
+        cell.dataset.col = j;
+        cell.addEventListener('click', selectCell);
+        wordSearch.appendChild(cell);
       }
     }
+  }
 
-    function displayGrid() {
-      const wordSearch = document.getElementById('wordSearch');
-      wordSearch.innerHTML = '';
-      for (let i = 0; i < 20; i++) {
-        for (let j = 0; j < 20; j++) {
-          const cell = document.createElement('div');
-          cell.classList.add('cell');
-          cell.textContent = grid[i][j];
-          cell.dataset.row = i;
-          cell.dataset.col = j;
-          cell.addEventListener('click', selectCell);
-          wordSearch.appendChild(cell);
-        }
-      }
+  function selectCell(event) {
+    const cell = event.target;
+    const row = parseInt(cell.dataset.row);
+    const col = parseInt(cell.dataset.col);
+    if (cell.classList.contains('selected')) {
+      cell.classList.remove('selected');
+      selectedCells = selectedCells.filter(c => !(c.row === row && c.col === col));
+    } else {
+      cell.classList.add('selected');
+      selectedCells.push({ row, col });
+      checkWord();
     }
+  }
 
-    function selectCell(event) {
-      const cell = event.target;
-      const row = parseInt(cell.dataset.row);
-      const col = parseInt(cell.dataset.col);
-      if (cell.classList.contains('selected')) {
-        cell.classList.remove('selected');
-        selectedCells = selectedCells.filter(c => !(c.row === row && c.col === col));
-      } else {
-        cell.classList.add('selected');
-        selectedCells.push({ row, col });
-        checkWord();
-      }
+  function checkWord() {
+    const selectedWord = selectedCells.map(cell => grid[cell.row][cell.col]).join('');
+    if (selectedWord === words[0]) {
+      clearInterval(timer);
+      document.getElementById('message').textContent = 'Congratulations! You found the word "apple"!';
+      document.getElementById('message').insertAdjacentHTML('beforeend', '<p>Now look for apple at the stack/shelf displays throughout the library to form the sentence.</p>');
+      hideGrid(); // Call function to hide the grid
     }
+  }
 
-    function checkWord() {
-      const selectedWord = selectedCells.map(cell => grid[cell.row][cell.col]).join('');
-      if (selectedWord === words[0]) {
+  function hideGrid() {
+    document.getElementById('wordSearch').style.display = 'none';
+  }
+
+  function countdown() {
+    const countdownDisplay = document.getElementById('countdown');
+    timer = setInterval(() => {
+      timeLeft--;
+      countdownDisplay.textContent = timeLeft;
+      if (timeLeft <= 0) {
         clearInterval(timer);
-        document.getElementById('message').textContent = 'Congratulations! You found the word "apple"!'\n 'Now look for apple at the book stacks/shelves.';
-        hideGrid(); // Call function to hide the grid
+        timeLeft = 120;
+        shuffleGrid();
       }
-    }
+    }, 1000);
+  }
 
-    function hideGrid() {
-      document.getElementById('wordSearch').style.display = 'none';
-    }
-
-    function countdown() {
-      const countdownDisplay = document.getElementById('countdown');
-      timer = setInterval(() => {
-        timeLeft--;
-        countdownDisplay.textContent = timeLeft;
-        if (timeLeft <= 0) {
-          clearInterval(timer);
-          timeLeft = 120;
-          shuffleGrid();
-        }
-      }, 1000);
-    }
-
-    function shuffleGrid() {
-      grid = [];
-      generateGrid();
-      displayGrid();
-      document.getElementById('message').textContent = '';
-      selectedCells = [];
-    }
-
-    // Initialize the game
+  function shuffleGrid() {
+    grid = [];
     generateGrid();
     displayGrid();
-    countdown();
-  </script>
-</body>
-</html>
+    document.getElementById('message').textContent = '';
+    selectedCells = [];
+  }
+
+  // Initialize the game
+  generateGrid();
+  displayGrid();
+  countdown();
+</script>
