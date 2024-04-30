@@ -8,13 +8,17 @@
     body {
       font-family: Arial, sans-serif;
     }
+    #timer {
+      font-size: 2em;
+      text-align: center;
+      margin-bottom: 20px; /* Add margin to separate from the grid */
+    }
     #wordSearch {
       display: grid;
       grid-template-columns: repeat(20, 5vw);
       grid-template-rows: repeat(20, 5vw);
       gap: 1px;
       border: 1px solid black;
-      margin-bottom: 20px;
       max-width: 90vw;
       margin: 0 auto;
     }
@@ -29,10 +33,6 @@
     .selected {
       background-color: #aaf;
     }
-    #timer {
-      font-size: 2em;
-      text-align: center;
-    }
     #message {
       font-size: 1.2em;
       text-align: center;
@@ -40,8 +40,8 @@
   </style>
 </head>
 <body>
-  <div id="wordSearch"></div>
   <div id="timer">Time Left: <span id="countdown">120</span> seconds</div>
+  <div id="wordSearch"></div>
   <div id="message"></div>
 
   <script>
@@ -104,7 +104,12 @@
       if (selectedWord === words[0]) {
         clearInterval(timer);
         document.getElementById('message').textContent = 'Congratulations! You found the word "apple"!';
+        hideGrid(); // Call function to hide the grid
       }
+    }
+
+    function hideGrid() {
+      document.getElementById('wordSearch').style.display = 'none';
     }
 
     function countdown() {
